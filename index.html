@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Ti 🌻</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #111;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Lienzo para las flores */
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Tarjeta Central */
+        .card {
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 253, 240, 0.95);
+            padding: 30px 20px;
+            border-radius: 20px;
+            border: 3px solid #FFD700;
+            box-shadow: 0 10px 30px rgba(218, 165, 32, 0.5);
+            text-align: center;
+            max-width: 85%;
+            width: 380px;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        h1 {
+            color: #B8860B;
+            font-size: 1.6rem;
+            margin-bottom: 12px;
+        }
+
+        p {
+            color: #444;
+            font-size: 1.05rem;
+            font-style: italic;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .btn {
+            background: #FFD700;
+            color: #333;
+            border: none;
+            padding: 12px 24px;
+            font-weight: bold;
+            font-size: 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: transform 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="flowerCanvas"></canvas>
+
+    <div class="card">
+        <h1>¡Feliz 21 de Septiembre! 🌻</h1>
+        <p>Él no se olvidó de tus flores amarillas...</p>
+        <button class="btn" onclick="playMusic()">Presiona para reproducir 🎵</button>
+    </div>
+
+    <!-- Audio de fondo (reemplazar 'flores.mp3' por la ruta de tu audio) -->
+    <audio id="bgMusic" loop>
+        <source src="flores.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const canvas = document.getElementById('flowerCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Clase para las flores amarillas
+        class Flower {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = -Math.random() * 100 - 20;
+                this.speedY = Math.random() * 2 + 1;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.scale = Math.random() * 0.4 + 0.4;
+                this.angle = Math.random() * 360;
+                this.spin = Math.random() * 0.02 - 0.01;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += Math.sin(this.y / 30) * 0.8 + this.speedX;
+                this.angle += this.spin;
+
+                if (this.y > canvas.height + 40) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                ctx.scale(this.scale, this.scale);
+
+                // Dibujar 5 pétalos
+                ctx.fillStyle = '#FFD700';
+                for (let i = 0; i < 5; i++) {
+                    ctx.beginPath();
+                    ctx.ellipse(0, -15, 8, 15, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.rotate((Math.PI * 2) / 5);
+                }
+
+                // Centro café
+                ctx.fillStyle = '#8B4513';
+                ctx.beginPath();
+                ctx.arc(0, 0, 8, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+            }
+        }
+
+        const flowers = Array.from({ length: 35 }, () => new Flower());
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            flowers.forEach(flower => {
+                flower.update();
+                flower.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Los navegadores móviles bloquean el audio automático sin interacción previa
+        function playMusic() {
+            const audio = document.getElementById('bgMusic');
+            audio.play();
+            document.querySelector('.btn').innerText = "¡Disfrútalo! ✨";
+        }
+    </script>
+</body>
+</html>
